@@ -1,4 +1,4 @@
-_target_: diffusion_policy.workspace.train_ebc_lowdim_workspace.TrainEbcLowdimWorkspace
+_target_: diffusion_policy.workspace.train_mdn_lowdim_workspace.TrainMdnLowdimWorkspace
 action_dim: 2
 checkpoint:
   save_last_ckpt: true
@@ -22,20 +22,20 @@ logging:
   group: null
   id: null
   mode: online
-  name: 2023.01.16-20.19.25_train_ebc_lowdim_pusht_lowdim
+  name: 2023.01.16-20.19.25_train_mdn_lowdim_pusht_lowdim
   project: diffusion_policy_debug
   resume: true
   tags:
-  - train_ebc_lowdim
+  - train_mdn_lowdim
   - pusht_lowdim
   - default
 multi_run:
-  run_dir: data/outputs/2023.01.16/20.19.25_train_ebc_lowdim_pusht_lowdim
-  wandb_name_base: 2023.01.16-20.19.25_train_ebc_lowdim_pusht_lowdim
-n_action_steps: 1 
+  run_dir: data/outputs/2023.01.16/20.19.25_train_mdn_lowdim_pusht_lowdim
+  wandb_name_base: 2023.01.16-20.19.25_train_mdn_lowdim_pusht_lowdim
+n_action_steps: 1
 n_latency_steps: 0
 n_obs_steps: 2
-name: train_ebc_lowdim
+name: train_mdn_lowdim
 obs_dim: 20
 optimizer:
   _target_: torch.optim.AdamW
@@ -47,12 +47,13 @@ optimizer:
   weight_decay: 1.0e-06
 past_action_visible: false
 policy:
-  _target_: diffusion_policy.policy.ebc_lowdim_policy.EbcLowdimPolicy
+  _target_: diffusion_policy.policy.mdn_lowdim_policy.MDNLowdimPolicy
   action_dim: 2
   dropout: 0.1
   n_action_steps: 1
   n_obs_steps: 2
   obs_dim: 20
+  n_gaussians: 5
 task:
   action_dim: 2
   dataset:
