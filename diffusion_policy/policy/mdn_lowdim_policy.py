@@ -76,9 +76,9 @@ class MDNLowdimPolicy(BaseLowdimPolicy):
         """
         assert 'obs' in obs_dict
         nobs = self.normalizer['obs'].normalize(obs_dict['obs'])
-        B, To, Do = nobs.shape
+        B, _, Do = nobs.shape
+        To = self.n_obs_steps
         assert Do == self.obs_dim
-        Ta = self.n_action_steps
 
         # only take necessary obs
         this_obs = nobs[:,:To]

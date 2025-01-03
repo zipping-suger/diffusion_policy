@@ -15,7 +15,7 @@ dataloader:
   pin_memory: true
   shuffle: true
 exp_name: default
-horizon: 2
+horizon: 1
 keypoint_dim: 2
 keypoint_visible_rate: 1.0
 logging:
@@ -34,7 +34,7 @@ multi_run:
   wandb_name_base: 2023.01.16-20.19.25_train_ebc_lowdim_pusht_lowdim
 n_action_steps: 1 
 n_latency_steps: 0
-n_obs_steps: 2
+n_obs_steps: 1
 name: train_ebc_lowdim
 obs_dim: 20
 optimizer:
@@ -51,16 +51,16 @@ policy:
   action_dim: 2
   dropout: 0.1
   n_action_steps: 1
-  n_obs_steps: 2
+  n_obs_steps: 1
   obs_dim: 20
 task:
   action_dim: 2
   dataset:
     _target_: diffusion_policy.dataset.pusht_dataset.PushTLowdimDataset
-    horizon: 2
+    horizon: 1
     max_train_episodes: 90
     pad_after: 0
-    pad_before: 1
+    pad_before: 0
     seed: 42
     val_ratio: 0.02
     zarr_path: data/pusht/pusht_cchi_v7_replay.zarr
@@ -74,7 +74,7 @@ task:
     n_action_steps: 1
     n_envs: null
     n_latency_steps: 0
-    n_obs_steps: 2
+    n_obs_steps: 1
     n_test: 50
     n_test_vis: 4
     n_train: 6
