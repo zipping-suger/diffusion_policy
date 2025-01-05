@@ -9,6 +9,7 @@ class CondGANPolicy(BaseLowdimPolicy):
     def __init__(self,
             obs_dim, 
             action_dim, 
+            latent_dim,
             n_action_steps, 
             n_obs_steps,
             dropout=0.3
@@ -16,6 +17,7 @@ class CondGANPolicy(BaseLowdimPolicy):
         super().__init__()
 
         self.obs_dim = obs_dim
+        self.latent_dim = latent_dim
         self.action_dim = action_dim
         self.n_obs_steps = n_obs_steps
         self.n_action_steps = n_action_steps
@@ -25,7 +27,7 @@ class CondGANPolicy(BaseLowdimPolicy):
         mid_channels = 1024
         out_channels = action_dim * n_action_steps
 
-        self.gen_dense0 = nn.Linear(in_features=in_channels, out_features=mid_channels)
+        self.gen_dense0 = nn.Linear(in_features=in_channels + latent_dim, out_features=mid_channels)
         self.gen_dense1 = nn.Linear(in_features=mid_channels, out_features=mid_channels)
         self.gen_dense2 = nn.Linear(in_features=mid_channels, out_features=mid_channels)
         self.gen_dense3 = nn.Linear(in_features=mid_channels, out_features=mid_channels)
@@ -48,6 +50,9 @@ class CondGANPolicy(BaseLowdimPolicy):
     def forward(self, obs):
         B, To, Do = obs.shape
         x = obs.reshape(B, -1)
+        # sample latent variable from normal distribution
+        latent = torch.randn(B, self.latent_dim).to(obs.device)
+        x = torch.cat([x, latent], dim=-1)
         x = F.leaky_relu(self.gen_dense0(x), 0.2, inplace=True)
         x = F.leaky_relu(self.gen_dense1(x), 0.2, inplace=True)
         x = F.leaky_relu(self.gen_dense2(x), 0.2, inplace=True)
@@ -125,7 +130,8 @@ class CondGANPolicy(BaseLowdimPolicy):
             device=this_action.device)
 
         # forward pass for generator
-        pred_action = self.forward(this_obs)
+        with torch.no_grad(): # IMPORTANT: no grad for generator when computing discriminator loss
+            pred_action = self.forward(this_obs)
 
         # discriminator loss
         real_labels = torch.ones(B, 1).to(this_obs.device)
@@ -139,7 +145,8 @@ class CondGANPolicy(BaseLowdimPolicy):
         d_loss = d_loss_real + d_loss_fake
 
         # generator loss
-        fake_output = self.discriminator_forward(this_obs, pred_action)
+        grad_pred_action = self.forward(this_obs) # IMPORTANT: grad for generator when computing generator loss
+        fake_output = self.discriminator_forward(this_obs, grad_pred_action)
         g_loss = F.binary_cross_entropy_with_logits(fake_output, real_labels)
 
         return g_loss, d_loss

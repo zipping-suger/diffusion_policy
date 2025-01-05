@@ -1,4 +1,4 @@
-_target_: diffusion_policy.workspace.train_cgan_lowdim_workspace.TrainCganLowdimWorkspace
+_target_: diffusion_policy.workspace.train_ebgan_lowdim_workspace.TrainEbganLowdimWorkspace
 action_dim: 2
 checkpoint:
   save_last_ckpt: true
@@ -22,20 +22,20 @@ logging:
   group: null
   id: null
   mode: online
-  name: 2023.01.16-20.19.25_train_cgan_lowdim_pusht_lowdim
+  name: 2023.01.16-20.19.25_train_ebgan_lowdim_pusht_lowdim
   project: diffusion_policy_debug
   resume: true
   tags:
-  - train_cgan_lowdim
+  - train_ebgan_lowdim
   - pusht_lowdim
   - default
 multi_run:
-  run_dir: data/outputs/2023.01.16/20.19.25_train_cgan_lowdim_pusht_lowdim
-  wandb_name_base: 2023.01.16-20.19.25_train_cgan_lowdim_pusht_lowdim
+  run_dir: data/outputs/2023.01.16/20.19.25_train_ebgan_lowdim_pusht_lowdim
+  wandb_name_base: 2023.01.16-20.19.25_train_ebgan_lowdim_pusht_lowdim
 n_action_steps: 1
 n_latency_steps: 0
 n_obs_steps: 2
-name: train_cgan_lowdim
+name: train_ebgan_lowdim
 obs_dim: 20
 optimizer:
   _target_: torch.optim.AdamW
@@ -43,17 +43,19 @@ optimizer:
   - 0.95
   - 0.999
   eps: 1.0e-08
-  lr: 0.00005
+  lr: 0.0001
   weight_decay: 1.0e-06
 past_action_visible: false
 policy:
-  _target_: diffusion_policy.policy.cgan_lowdim_policy.CondGANPolicy
+  _target_: diffusion_policy.policy.ebgan_lowdim_policy.EbganLowdimPolicy
   action_dim: 2
   dropout: 0.1
   n_action_steps: 1
   n_obs_steps: 2
   obs_dim: 20
-  latent_dim: 10
+  horizon: 2
+  pred_n_samples: 1024
+  train_n_neg: 256
 task:
   action_dim: 2
   dataset:
@@ -91,7 +93,7 @@ training:
   checkpoint_every: 50
   debug: false
   device: cuda:0
-  disc_updates: 3
+  energy_updates: 3
   gradient_accumulate_every: 1
   lr_scheduler: cosine
   lr_warmup_steps: 500
